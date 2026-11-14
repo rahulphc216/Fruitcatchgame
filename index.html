@@ -84,7 +84,6 @@ let raf=0,last=0,spawnClock=0;
 let level=1,nextBonus=50;
 let width=0,height=0;
 
-// Target fruit control
 let fruitsSinceTarget=0;
 let forceTargetNext=true;
 
@@ -104,8 +103,6 @@ function updateStats(){
 function chooseTarget(){
  target=fruits[Math.floor(Math.random()*fruits.length)];
  $('targetFruit').textContent=target;
-
- // The next newly falling fruit must match the new target.
  forceTargetNext=true;
  fruitsSinceTarget=0;
 }
@@ -142,7 +139,6 @@ function endGame(){
  $('feedback').textContent='Game over — great try! 🎮';
 }
 
-// Create falling fruits with guaranteed target appearances.
 function spawnFruit(){
 
  const size=48;
@@ -152,7 +148,6 @@ function spawnFruit(){
   Math.round((i+.5)*width/laneCount-size/2)
  );
 
- // Keep fruits separated to prevent overlap.
  const available=lanes.filter(x=>
   items.every(o=>
    Math.abs(o.baseX-x)>size+3 || o.y>size+18
@@ -165,27 +160,17 @@ function spawnFruit(){
 
  let fruit;
 
- // Always show target immediately after target changes.
  if(forceTargetNext){
-
   fruit=target;
   forceTargetNext=false;
   fruitsSinceTarget=0;
-
  }else if(fruitsSinceTarget>=2){
-
-  // After at most two non-target fruits, show target.
   fruit=target;
   fruitsSinceTarget=0;
-
  }else{
-
-  // Other fruits remain random.
   const otherFruits=fruits.filter(f=>f!==target);
   fruit=otherFruits[Math.floor(Math.random()*otherFruits.length)];
-
   fruitsSinceTarget++;
-
  }
 
  const el=document.createElement('button');
@@ -200,7 +185,8 @@ function spawnFruit(){
   el,fruit,baseX,x:baseX,y:-54,
   phase:random(0,Math.PI*2),
   amplitude:random(7,17),
-  speed:random(72,92)*(1+(level-1)*.17)
+  // Falling speed increased by approximately 30%.
+  speed:random(94,120)*(1+(level-1)*.17)
  };
 
  el.addEventListener('click',()=>selectFruit(item));
@@ -219,26 +205,19 @@ function selectFruit(item){
  if(!running||paused||!items.includes(item))return;
 
  if(item.fruit===target){
-
   score+=5;
   $('feedback').textContent='⭐ Correct! +5 points!';
-
  }else{
-
   lives--;
   $('feedback').textContent='❌ Wrong fruit! One life lost.';
-
  }
 
  items.splice(items.indexOf(item),1);
  item.el.remove();
 
- // Every 50 points: 2 additional lives.
  while(score>=nextBonus){
-
   lives+=2;
   nextBonus+=50;
-
   $('feedback').textContent='🎉 Bonus! +2 extra lives!';
  }
 
@@ -250,7 +229,6 @@ function selectFruit(item){
   return;
  }
 
- // New target and immediate matching fruit.
  chooseTarget();
 }
 
@@ -262,8 +240,8 @@ function frame(time){
  last=time;
  spawnClock+=dt;
 
- // Gradually increase speed and spawn frequency.
- const interval=Math.max(.48,1.18-(level-1)*.075);
+ // Fruits now appear slightly faster too.
+ const interval=Math.max(.42,1.05-(level-1)*.075);
 
  if(spawnClock>=interval){
   spawnClock=0;
@@ -277,7 +255,6 @@ function frame(time){
   o.y+=o.speed*dt;
   o.phase+=dt*2.1;
 
-  // Zigzag movement.
   o.x=Math.max(0,Math.min(
    width-48,
    o.baseX+Math.sin(o.phase)*o.amplitude
@@ -343,19 +320,14 @@ $('pause').addEventListener('click',()=>{
 });
 
 if('ResizeObserver'in window){
-
  new ResizeObserver(()=>{
-
   resize();
-
   items.forEach(o=>{
    o.baseX=Math.min(o.baseX,width-48);
    o.x=Math.min(o.x,width-48);
    place(o);
   });
-
  }).observe(arena);
-
 }else{
  window.addEventListener('resize',resize);
 }
