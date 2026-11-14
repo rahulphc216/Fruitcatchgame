@@ -75,25 +75,18 @@ button{font:inherit}
 const $=id=>document.getElementById(id);
 
 const fruits=['🍎','🍌','🍊','🍇','🍉','🍓','🍍','🥝','🍐','🍒','🥭','🫐'];
-
 const arena=$('arena');
 
-let score=0;
-let lives=3;
-let target='🍎';
+let score=0,lives=3,target='🍎';
 let items=[];
-let running=false;
-let paused=false;
-let raf=0;
-let last=0;
-let spawnClock=0;
-let level=1;
-let nextBonus=50;
-let width=0;
-let height=0;
+let running=false,paused=false;
+let raf=0,last=0,spawnClock=0;
+let level=1,nextBonus=50;
+let width=0,height=0;
 
-// Count fruits shown since last matching fruit.
+// Target fruit control
 let fruitsSinceTarget=0;
+let forceTargetNext=true;
 
 const random=(a,b)=>Math.random()*(b-a)+a;
 
@@ -108,11 +101,13 @@ function updateStats(){
  $('level').textContent=level;
 }
 
-// Select a new target.
 function chooseTarget(){
  target=fruits[Math.floor(Math.random()*fruits.length)];
- fruitsSinceTarget=0;
  $('targetFruit').textContent=target;
+
+ // The next newly falling fruit must match the new target.
+ forceTargetNext=true;
+ fruitsSinceTarget=0;
 }
 
 function clearItems(){
@@ -147,7 +142,7 @@ function endGame(){
  $('feedback').textContent='Game over — great try! 🎮';
 }
 
-// Create falling fruits.
+// Create falling fruits with guaranteed target appearances.
 function spawnFruit(){
 
  const size=48;
@@ -157,7 +152,7 @@ function spawnFruit(){
   Math.round((i+.5)*width/laneCount-size/2)
  );
 
- // Avoid overlapping fruits.
+ // Keep fruits separated to prevent overlap.
  const available=lanes.filter(x=>
   items.every(o=>
    Math.abs(o.baseX-x)>size+3 || o.y>size+18
@@ -170,21 +165,26 @@ function spawnFruit(){
 
  let fruit;
 
- // Guaranteed target fruit after maximum 3 other fruits.
- if(fruitsSinceTarget>=3){
+ // Always show target immediately after target changes.
+ if(forceTargetNext){
 
+  fruit=target;
+  forceTargetNext=false;
+  fruitsSinceTarget=0;
+
+ }else if(fruitsSinceTarget>=2){
+
+  // After at most two non-target fruits, show target.
   fruit=target;
   fruitsSinceTarget=0;
 
  }else{
 
-  fruit=fruits[Math.floor(Math.random()*fruits.length)];
+  // Other fruits remain random.
+  const otherFruits=fruits.filter(f=>f!==target);
+  fruit=otherFruits[Math.floor(Math.random()*otherFruits.length)];
 
-  if(fruit===target){
-   fruitsSinceTarget=0;
-  }else{
-   fruitsSinceTarget++;
-  }
+  fruitsSinceTarget++;
 
  }
 
@@ -197,11 +197,7 @@ function spawnFruit(){
  arena.appendChild(el);
 
  const item={
-  el,
-  fruit,
-  baseX,
-  x:baseX,
-  y:-54,
+  el,fruit,baseX,x:baseX,y:-54,
   phase:random(0,Math.PI*2),
   amplitude:random(7,17),
   speed:random(72,92)*(1+(level-1)*.17)
@@ -218,7 +214,6 @@ function place(o){
  o.el.style.top=o.y+'px';
 }
 
-// Fruit selection.
 function selectFruit(item){
 
  if(!running||paused||!items.includes(item))return;
@@ -238,18 +233,16 @@ function selectFruit(item){
  items.splice(items.indexOf(item),1);
  item.el.remove();
 
- // Bonus lives at every 50 points.
+ // Every 50 points: 2 additional lives.
  while(score>=nextBonus){
 
   lives+=2;
   nextBonus+=50;
 
   $('feedback').textContent='🎉 Bonus! +2 extra lives!';
-
  }
 
  level=1+Math.floor(score/100);
-
  updateStats();
 
  if(lives<=0){
@@ -257,26 +250,24 @@ function selectFruit(item){
   return;
  }
 
+ // New target and immediate matching fruit.
  chooseTarget();
 }
 
-// Main game animation.
 function frame(time){
 
  if(!running||paused)return;
 
  const dt=Math.min((time-last)/1000,.05);
  last=time;
-
  spawnClock+=dt;
 
+ // Gradually increase speed and spawn frequency.
  const interval=Math.max(.48,1.18-(level-1)*.075);
 
  if(spawnClock>=interval){
-
   spawnClock=0;
   spawnFruit();
-
  }
 
  for(let i=items.length-1;i>=0;i--){
@@ -295,18 +286,14 @@ function frame(time){
   place(o);
 
   if(o.y>height+5){
-
    items.splice(i,1);
    o.el.remove();
-
   }
-
  }
 
  raf=requestAnimationFrame(frame);
 }
 
-// Start or restart game.
 function startGame(){
 
  cancelAnimationFrame(raf);
@@ -321,6 +308,7 @@ function startGame(){
  paused=false;
  running=true;
  fruitsSinceTarget=0;
+ forceTargetNext=true;
 
  resize();
  chooseTarget();
@@ -336,33 +324,24 @@ function startGame(){
 $('start').addEventListener('click',startGame);
 $('restart').addEventListener('click',startGame);
 
-// Pause and resume.
 $('pause').addEventListener('click',()=>{
 
  if(!running)return;
 
  paused=!paused;
-
  $('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';
 
  $('feedback').textContent=paused?
-  'Game paused':
-  'Keep catching! 🍎';
+  'Game paused':'Keep catching! 🍎';
 
  if(paused){
-
   cancelAnimationFrame(raf);
-
  }else{
-
   last=0;
   raf=requestAnimationFrame(frame);
-
  }
-
 });
 
-// Responsive screen.
 if('ResizeObserver'in window){
 
  new ResizeObserver(()=>{
@@ -370,20 +349,15 @@ if('ResizeObserver'in window){
   resize();
 
   items.forEach(o=>{
-
    o.baseX=Math.min(o.baseX,width-48);
    o.x=Math.min(o.x,width-48);
-
    place(o);
-
   });
 
  }).observe(arena);
 
 }else{
-
  window.addEventListener('resize',resize);
-
 }
 
 resize();
