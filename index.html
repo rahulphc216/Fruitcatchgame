@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#b9ebff">
+<title>Fruit Catch Challenge</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:15px;background:linear-gradient(145deg,#e8f8ff,#efffee);font-family:Arial,sans-serif;color:#173b2c}
+main{max-width:520px;margin:auto}
+h1{text-align:center;color:#176847;font-size:29px}
+.sub{text-align:center;color:#527263}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:white;border-radius:14px;padding:10px;text-align:center}
+.stat small{display:block;color:#648172;font-weight:bold}
+.stat strong{font-size:22px}
+.target{margin:12px 0;display:flex;align-items:center;justify-content:center;gap:12px;background:white;border:2px solid #b8e8cf;border-radius:16px;padding:10px;font-weight:bold}
+#targetFruit{font-size:38px}
+#arena{position:relative;height:62vh;min-height:390px;max-height:570px;overflow:hidden;border:2px solid #8bcdb0;border-radius:20px;background:linear-gradient(#c9f1ff,#e8fae9 75%,#c8ebc5);touch-action:manipulation}
+.fruit{position:absolute;width:48px;height:48px;border:1px solid white;border-radius:15px;background:#ffffffdf;box-shadow:0 3px 9px #315b4630;display:grid;place-items:center;font-size:31px;cursor:pointer;padding:0}
+.overlay{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:18px;background:#dff5e9aa}
+.panel{width:min(100%,330px);background:#ffffffed;border-radius:20px;padding:22px;text-align:center;color:#174b35;box-shadow:0 12px 35px #164d322b}
+.panel .big{font-size:48px}
+.panel h2{font-size:26px}
+.panel p{font-size:14px;line-height:1.5}
+button{font:inherit}
+.action{width:100%;border:0;border-radius:13px;background:#16865c;color:white;padding:13px;font-weight:bold;font-size:16px}
+.controls{display:flex;gap:10px;margin-top:12px}
+.secondary{flex:1;border:1px solid #cce5d6;border-radius:12px;background:white;color:#24583e;padding:12px;font-weight:bold}
+#feedback{text-align:center;min-height:25px;margin-top:12px;font-weight:bold;color:#357456}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>🍓 Fruit Catch Challenge 🍍</h1>
+<p class="sub">Catch only the matching fruit!</p>
+
+<div class="stats">
+ <div class="stat"><small>SCORE</small><strong id="score">0</strong></div>
+ <div class="stat"><small>LIVES</small><strong id="lives">❤️❤️❤️</strong></div>
+ <div class="stat"><small>LEVEL</small><strong id="level">1</strong></div>
+</div>
+
+<div class="target">
+ FIND THIS FRUIT
+ <span id="targetFruit">🍎</span>
+ <span style="font-size:12px">Tap the match!</span>
+</div>
+
+<div id="arena">
+ <div id="overlay" class="overlay">
+  <div class="panel">
+   <div class="big">🍎🍌🍇</div>
+   <h2 id="panelTitle">Ready to play?</h2>
+   <p id="panelText">Tap only the matching fruit as fruits fall and zigzag down the screen. Wrong fruit costs one life!</p>
+   <button id="start" class="action">▶ START GAME</button>
+  </div>
+ </div>
+</div>
+
+<div class="controls">
+ <button id="restart" class="secondary">↻ Restart</button>
+ <button id="pause" class="secondary">Ⅱ Pause</button>
+</div>
+<div id="feedback">Every 50 points earns 2 extra lives ⭐</div>
+
+</main>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const fruits=['🍎','🍌','🍊','🍇','🍉','🍓','🍍','🥝','🍐','🍒','🥭','🫐'];
+const arena=$('arena');
+
+let score=0,lives=3,target='🍎',items=[];
+let running=false,paused=false,raf=0,last=0;
+let spawnClock=0,level=1,nextBonus=50,width=0,height=0;
+
+const random=(a,b)=>Math.random()*(b-a)+a;
+
+function resize(){
+ width=arena.clientWidth;
+ height=arena.clientHeight;
+}
+
+function updateStats(){
+ $('score').textContent=score;
+ $('lives').textContent='❤️'.repeat(Math.min(lives,12))+(lives>12?' +'+(lives-12):'');
+ $('level').textContent=level;
+}
+
+function chooseTarget(){
+ target=fruits[Math.floor(Math.random()*fruits.length)];
+ $('targetFruit').textContent=target;
+}
+
+function clearItems(){
+ items.forEach(item=>item.el.remove());
+ items=[];
+}
+
+function showOverlay(title,description,buttonText){
+ $('panelTitle').textContent=title;
+ $('panelText').textContent=description;
+ $('start').textContent=buttonText;
+ $('overlay').classList.remove('hidden');
+}
+
+function hideOverlay(){
+ $('overlay').classList.add('hidden');
+}
+
+function endGame(){
+ running=false;
+ paused=false;
+ cancelAnimationFrame(raf);
+ clearItems();
+ showOverlay('Game Over!','Your score: '+score+' points. Try again!','↻ PLAY AGAIN');
+ $('pause').textContent='Ⅱ Pause';
+ $('feedback').textContent='Game over — great try! 🎮';
+}
+
+function spawnFruit(){
+ const size=48;
+ const laneCount=Math.max(3,Math.floor(width/66));
+
+ const lanes=Array.from({length:laneCount},(_,i)=>
+  Math.round((i+.5)*width/laneCount-size/2)
+ );
+
+ // Prevent fruits from overlapping vertically in the same lane.
+ const available=lanes.filter(x=>
+  items.every(o=>Math.abs(o.baseX-x)>size+3||o.y>size+18)
+ );
+
+ if(!available.length)return;
+
+ const baseX=available[Math.floor(Math.random()*available.length)];
+ const fruit=fruits[Math.floor(Math.random()*fruits.length)];
+
+ const el=document.createElement('button');
+ el.type='button';
+ el.className='fruit';
+ el.textContent=fruit;
+ el.setAttribute('aria-label','Tap fruit '+fruit);
+ arena.appendChild(el);
+
+ const item={
+  el,fruit,baseX,x:baseX,y:-54,
+  phase:random(0,Math.PI*2),
+  amplitude:random(7,17),
+  speed:random(72,92)*(1+(level-1)*.17)
+ };
+
+ el.addEventListener('click',()=>selectFruit(item));
+ items.push(item);
+ place(item);
+}
+
+function place(o){
+ o.el.style.left=o.x+'px';
+ o.el.style.top=o.y+'px';
+}
+
+function selectFruit(item){
+ if(!running||paused||!items.includes(item))return;
+
+ if(item.fruit===target){
+  score+=5;
+  $('feedback').textContent='⭐ Correct! +5 points!';
+ }else{
+  lives--;
+  $('feedback').textContent='❌ Wrong fruit! One life lost.';
+ }
+
+ items.splice(items.indexOf(item),1);
+ item.el.remove();
+
+ // Every 50 points: 2 bonus lives.
+ while(score>=nextBonus){
+  lives+=2;
+  nextBonus+=50;
+  $('feedback').textContent='🎉 Bonus! +2 extra lives!';
+ }
+
+ level=1+Math.floor(score/100);
+ updateStats();
+
+ if(lives<=0){
+  endGame();
+  return;
+ }
+
+ chooseTarget();
+}
+
+function frame(time){
+ if(!running||paused)return;
+
+ const dt=Math.min((time-last)/1000,.05);
+ last=time;
+ spawnClock+=dt;
+
+ const interval=Math.max(.48,1.18-(level-1)*.075);
+
+ if(spawnClock>=interval){
+  spawnClock=0;
+  spawnFruit();
+ }
+
+ for(let i=items.length-1;i>=0;i--){
+  const o=items[i];
+
+  o.y+=o.speed*dt;
+  o.phase+=dt*2.1;
+
+  // Zigzag movement.
+  o.x=Math.max(0,Math.min(width-48,
+   o.baseX+Math.sin(o.phase)*o.amplitude
+  ));
+
+  place(o);
+
+  if(o.y>height+5){
+   items.splice(i,1);
+   o.el.remove();
+  }
+ }
+
+ raf=requestAnimationFrame(frame);
+}
+
+function startGame(){
+ cancelAnimationFrame(raf);
+ clearItems();
+
+ score=0;
+ lives=3;
+ level=1;
+ nextBonus=50;
+ spawnClock=0;
+ last=0;
+ paused=false;
+ running=true;
+
+ resize();
+ chooseTarget();
+ updateStats();
+ hideOverlay();
+
+ $('pause').textContent='Ⅱ Pause';
+ $('feedback').textContent='Good luck! 🍀';
+
+ raf=requestAnimationFrame(frame);
+}
+
+$('start').addEventListener('click',startGame);
+$('restart').addEventListener('click',startGame);
+
+$('pause').addEventListener('click',()=>{
+ if(!running)return;
+
+ paused=!paused;
+ $('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';
+
+ $('feedback').textContent=paused?'Game paused':'Keep catching! 🍎';
+
+ if(paused){
+  cancelAnimationFrame(raf);
+ }else{
+  last=0;
+  raf=requestAnimationFrame(frame);
+ }
+});
+
+if('ResizeObserver'in window){
+ new ResizeObserver(()=>{
+  resize();
+  items.forEach(o=>{
+   o.baseX=Math.min(o.baseX,width-48);
+   o.x=Math.min(o.x,width-48);
+   place(o);
+  });
+ }).observe(arena);
+}else{
+ window.addEventListener('resize',resize);
+}
+
+resize();
+updateStats();
+})();
+</script>
+</body>
+</html>
