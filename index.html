@@ -26,6 +26,19 @@ header {
   padding: 12px 8px 5px;
 }
 
+.greeting {
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 1.5;
+  color: #ffffff;
+  background: linear-gradient(90deg, #b83218, #e87918, #b83218);
+  padding: 10px 8px;
+  margin: 0 auto 10px;
+  border-radius: 12px;
+  border: 2px solid #ffe66d;
+  text-shadow: 1px 1px 3px #542000;
+}
+
 h1 {
   margin: 4px 0 10px;
   font-size: 27px;
@@ -178,6 +191,7 @@ button:active {
 
 @media (max-height: 650px) {
   h1 { font-size: 22px; }
+  .greeting { font-size: 15px; padding: 7px; }
   .stat { padding: 5px 10px; }
   #gameArea { height: 48vh; min-height: 260px; }
   #targetFruit { font-size: 30px; }
@@ -188,6 +202,13 @@ button:active {
 <body>
 
 <header>
+
+  <div class="greeting">
+    🙏 बड़का और छोटका मुसहरा तथा छोटी की तरफ से 🙏
+    <br>
+    🌞 खुटहा का Happy Chhath Puja 🌞
+  </div>
+
   <h1>🍉 Fruit Catch Challenge 🍓</h1>
 
   <div class="stats">
@@ -200,6 +221,7 @@ button:active {
     <span>🎯 CATCH THIS FRUIT</span>
     <div id="targetFruit">🍎</div>
   </div>
+
 </header>
 
 <div id="gameArea">
@@ -295,7 +317,6 @@ function chooseTarget() {
 
   targetEl.textContent = target;
 
-  // Purane target fruits ko ab current target nahi maana jayega.
   objects.forEach(o => {
     o.isTarget = false;
   });
