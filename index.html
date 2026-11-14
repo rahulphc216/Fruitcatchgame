@@ -6,42 +6,177 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#b9ebff">
 <title>Fruit Catch Challenge</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;padding:15px;background:linear-gradient(145deg,#e8f8ff,#efffee);font-family:Arial,sans-serif;color:#173b2c}
+
+body{
+ margin:0;
+ padding:15px;
+ background:linear-gradient(145deg,#e8f8ff,#efffee);
+ font-family:Arial,sans-serif;
+ color:#173b2c;
+}
+
 main{max-width:520px;margin:auto}
-h1{text-align:center;color:#176847;font-size:29px}
+
+h1{
+ text-align:center;
+ color:#176847;
+ font-size:29px;
+}
+
 .sub{text-align:center;color:#527263}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat{background:white;border-radius:14px;padding:10px;text-align:center}
-.stat small{display:block;color:#648172;font-weight:bold}
+
+.stats{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:8px;
+}
+
+.stat{
+ background:white;
+ border-radius:14px;
+ padding:10px;
+ text-align:center;
+}
+
+.stat small{
+ display:block;
+ color:#648172;
+ font-weight:bold;
+}
+
 .stat strong{font-size:22px}
-.target{margin:12px 0;display:flex;align-items:center;justify-content:center;gap:12px;background:white;border:2px solid #b8e8cf;border-radius:16px;padding:10px;font-weight:bold}
+
+.target{
+ margin:12px 0;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:12px;
+ background:white;
+ border:2px solid #b8e8cf;
+ border-radius:16px;
+ padding:10px;
+ font-weight:bold;
+}
+
 #targetFruit{font-size:38px}
-#arena{position:relative;height:62vh;min-height:390px;max-height:570px;overflow:hidden;border:2px solid #8bcdb0;border-radius:20px;background:linear-gradient(#c9f1ff,#e8fae9 75%,#c8ebc5);touch-action:manipulation}
-.fruit{position:absolute;width:48px;height:48px;border:1px solid white;border-radius:15px;background:#ffffffdf;box-shadow:0 3px 9px #315b4630;display:grid;place-items:center;font-size:31px;cursor:pointer;padding:0}
-.overlay{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:18px;background:#dff5e9aa}
-.panel{width:min(100%,330px);background:#ffffffed;border-radius:20px;padding:22px;text-align:center;color:#174b35;box-shadow:0 12px 35px #164d322b}
+
+#arena{
+ position:relative;
+ height:62vh;
+ min-height:390px;
+ max-height:570px;
+ overflow:hidden;
+ border:2px solid #8bcdb0;
+ border-radius:20px;
+ background:linear-gradient(#c9f1ff,#e8fae9 75%,#c8ebc5);
+ touch-action:manipulation;
+}
+
+.fruit{
+ position:absolute;
+ width:48px;
+ height:48px;
+ border:1px solid white;
+ border-radius:15px;
+ background:#ffffffdf;
+ box-shadow:0 3px 9px #315b4630;
+ display:grid;
+ place-items:center;
+ font-size:31px;
+ cursor:pointer;
+ padding:0;
+}
+
+.overlay{
+ position:absolute;
+ inset:0;
+ z-index:5;
+ display:grid;
+ place-items:center;
+ padding:18px;
+ background:#dff5e9aa;
+}
+
+.panel{
+ width:min(100%,330px);
+ background:#ffffffed;
+ border-radius:20px;
+ padding:22px;
+ text-align:center;
+ color:#174b35;
+ box-shadow:0 12px 35px #164d322b;
+}
+
 .panel .big{font-size:48px}
 .panel h2{font-size:26px}
 .panel p{font-size:14px;line-height:1.5}
+
 button{font:inherit}
-.action{width:100%;border:0;border-radius:13px;background:#16865c;color:white;padding:13px;font-weight:bold;font-size:16px}
-.controls{display:flex;gap:10px;margin-top:12px}
-.secondary{flex:1;border:1px solid #cce5d6;border-radius:12px;background:white;color:#24583e;padding:12px;font-weight:bold}
-#feedback{text-align:center;min-height:25px;margin-top:12px;font-weight:bold;color:#357456}
+
+.action{
+ width:100%;
+ border:0;
+ border-radius:13px;
+ background:#16865c;
+ color:white;
+ padding:13px;
+ font-weight:bold;
+ font-size:16px;
+}
+
+.controls{
+ display:flex;
+ gap:10px;
+ margin-top:12px;
+}
+
+.secondary{
+ flex:1;
+ border:1px solid #cce5d6;
+ border-radius:12px;
+ background:white;
+ color:#24583e;
+ padding:12px;
+ font-weight:bold;
+}
+
+#feedback{
+ text-align:center;
+ min-height:25px;
+ margin-top:12px;
+ font-weight:bold;
+ color:#357456;
+}
+
 .hidden{display:none!important}
 </style>
 </head>
+
 <body>
 <main>
+
 <h1>🍓 Fruit Catch Challenge 🍍</h1>
 <p class="sub">Catch only the matching fruit!</p>
 
 <div class="stats">
- <div class="stat"><small>SCORE</small><strong id="score">0</strong></div>
- <div class="stat"><small>LIVES</small><strong id="lives">❤️❤️❤️</strong></div>
- <div class="stat"><small>LEVEL</small><strong id="level">1</strong></div>
+ <div class="stat">
+  <small>SCORE</small>
+  <strong id="score">0</strong>
+ </div>
+
+ <div class="stat">
+  <small>LIVES</small>
+  <strong id="lives">❤️❤️❤️</strong>
+ </div>
+
+ <div class="stat">
+  <small>LEVEL</small>
+  <strong id="level">1</strong>
+ </div>
 </div>
 
 <div class="target">
@@ -51,21 +186,32 @@ button{font:inherit}
 </div>
 
 <div id="arena">
+
  <div id="overlay" class="overlay">
   <div class="panel">
    <div class="big">🍎🍌🍇</div>
    <h2 id="panelTitle">Ready to play?</h2>
-   <p id="panelText">Tap only the matching fruit as fruits fall and zigzag down the screen. Wrong fruit costs one life!</p>
+
+   <p id="panelText">
+    Tap only the matching fruit as fruits fall and zigzag down the screen.
+    Wrong fruit costs one life!
+   </p>
+
    <button id="start" class="action">▶ START GAME</button>
   </div>
  </div>
+
 </div>
 
 <div class="controls">
  <button id="restart" class="secondary">↻ Restart</button>
  <button id="pause" class="secondary">Ⅱ Pause</button>
 </div>
-<div id="feedback">Every 50 points earns 2 extra lives ⭐</div>
+
+<div id="feedback">
+ Every 50 points earns 2 extra lives ⭐
+</div>
+
 </main>
 
 <script>
@@ -74,20 +220,42 @@ button{font:inherit}
 
 const $=id=>document.getElementById(id);
 
-const fruits=['🍎','🍌','🍊','🍇','🍉','🍓','🍍','🥝','🍐','🍒','🥭','🫐'];
+const fruits=[
+ '🍎','🍌','🍊','🍇','🍉','🍓',
+ '🍍','🥝','🍐','🍒','🥭','🫐'
+];
+
 const arena=$('arena');
 
-let score=0,lives=3,target='🍎';
-let items=[];
-let running=false,paused=false;
-let raf=0,last=0,spawnClock=0;
-let level=1,nextBonus=50;
-let width=0,height=0;
+let score=0;
+let lives=3;
+let target='🍎';
 
-let fruitsSinceTarget=0;
+let items=[];
+
+let running=false;
+let paused=false;
+
+let raf=0;
+let last=0;
+let spawnClock=0;
+let nextSpawnTime=0;
+
+let level=1;
+let nextBonus=50;
+
+let width=0;
+let height=0;
+
+// Target fruit scheduling
+let nonTargetCount=0;
+let targetGap=0;
 let forceTargetNext=true;
 
 const random=(a,b)=>Math.random()*(b-a)+a;
+
+const randomInt=(a,b)=>
+ Math.floor(Math.random()*(b-a+1))+a;
 
 function resize(){
  width=arena.clientWidth;
@@ -95,27 +263,52 @@ function resize(){
 }
 
 function updateStats(){
+
  $('score').textContent=score;
- $('lives').textContent='❤️'.repeat(Math.min(lives,12))+(lives>12?' +'+(lives-12):'');
+
+ $('lives').textContent=
+  '❤️'.repeat(Math.min(lives,12))+
+  (lives>12?' +'+(lives-12):'');
+
  $('level').textContent=level;
 }
 
+// Choose a new target
 function chooseTarget(){
- target=fruits[Math.floor(Math.random()*fruits.length)];
+
+ const oldTarget=target;
+
+ do{
+  target=fruits[randomInt(0,fruits.length-1)];
+ }while(target===oldTarget);
+
  $('targetFruit').textContent=target;
+
+ // After catching the target, next fruit is guaranteed.
  forceTargetNext=true;
- fruitsSinceTarget=0;
+ nonTargetCount=0;
+ targetGap=0;
+}
+
+// Random target gap: 0 to 5 other fruits
+function setRandomTargetGap(){
+
+ targetGap=randomInt(0,5);
+ nonTargetCount=0;
 }
 
 function clearItems(){
+
  items.forEach(item=>item.el.remove());
  items=[];
 }
 
 function showOverlay(title,description,buttonText){
+
  $('panelTitle').textContent=title;
  $('panelText').textContent=description;
  $('start').textContent=buttonText;
+
  $('overlay').classList.remove('hidden');
 }
 
@@ -124,8 +317,10 @@ function hideOverlay(){
 }
 
 function endGame(){
+
  running=false;
  paused=false;
+
  cancelAnimationFrame(raf);
  clearItems();
 
@@ -139,41 +334,60 @@ function endGame(){
  $('feedback').textContent='Game over — great try! 🎮';
 }
 
+// Spawn falling fruits
 function spawnFruit(){
 
  const size=48;
+
  const laneCount=Math.max(3,Math.floor(width/66));
 
- const lanes=Array.from({length:laneCount},(_,i)=>
-  Math.round((i+.5)*width/laneCount-size/2)
+ const lanes=Array.from(
+  {length:laneCount},
+  (_,i)=>Math.round((i+.5)*width/laneCount-size/2)
  );
 
+ // Prevent fruits from appearing too close together
  const available=lanes.filter(x=>
   items.every(o=>
-   Math.abs(o.baseX-x)>size+3 || o.y>size+18
+   Math.abs(o.baseX-x)>size+3 ||
+   o.y>size+18
   )
  );
 
  if(!available.length)return;
 
- const baseX=available[Math.floor(Math.random()*available.length)];
+ const baseX=
+  available[randomInt(0,available.length-1)];
 
  let fruit;
 
+ // Target appears according to a random gap
  if(forceTargetNext){
+
   fruit=target;
   forceTargetNext=false;
-  fruitsSinceTarget=0;
- }else if(fruitsSinceTarget>=2){
+
+  setRandomTargetGap();
+
+ }else if(nonTargetCount>=targetGap){
+
   fruit=target;
-  fruitsSinceTarget=0;
+
+  setRandomTargetGap();
+
  }else{
+
   const otherFruits=fruits.filter(f=>f!==target);
-  fruit=otherFruits[Math.floor(Math.random()*otherFruits.length)];
-  fruitsSinceTarget++;
+
+  fruit=otherFruits[
+   randomInt(0,otherFruits.length-1)
+  ];
+
+  nonTargetCount++;
  }
 
  const el=document.createElement('button');
+
  el.type='button';
  el.className='fruit';
  el.textContent=fruit;
@@ -181,21 +395,35 @@ function spawnFruit(){
 
  arena.appendChild(el);
 
+ const direction=Math.random()<.5?-1:1;
+
  const item={
-  el,fruit,baseX,x:baseX,y:-54,
+
+  el,
+  fruit,
+  baseX,
+  x:baseX,
+  y:-54,
+
+  // Stronger zigzag movement
   phase:random(0,Math.PI*2),
-  amplitude:random(7,17),
-  // Falling speed increased by approximately 30%.
-  speed:random(94,120)*(1+(level-1)*.17)
+  amplitude:random(22,43),
+  waveSpeed:random(2.5,3.6),
+  direction,
+
+  // Faster falling speed
+  speed:random(135,165)*(1+(level-1)*.20)
  };
 
  el.addEventListener('click',()=>selectFruit(item));
 
  items.push(item);
+
  place(item);
 }
 
 function place(o){
+
  o.el.style.left=o.x+'px';
  o.el.style.top=o.y+'px';
 }
@@ -205,23 +433,32 @@ function selectFruit(item){
  if(!running||paused||!items.includes(item))return;
 
  if(item.fruit===target){
+
   score+=5;
+
   $('feedback').textContent='⭐ Correct! +5 points!';
+
  }else{
+
   lives--;
+
   $('feedback').textContent='❌ Wrong fruit! One life lost.';
  }
 
  items.splice(items.indexOf(item),1);
  item.el.remove();
 
+ // Bonus lives after every 50 points
  while(score>=nextBonus){
+
   lives+=2;
   nextBonus+=50;
+
   $('feedback').textContent='🎉 Bonus! +2 extra lives!';
  }
 
  level=1+Math.floor(score/100);
+
  updateStats();
 
  if(lives<=0){
@@ -229,7 +466,11 @@ function selectFruit(item){
   return;
  }
 
- chooseTarget();
+ // Change target only after a correct catch.
+ // Wrong tap does not change the target.
+ if(item.fruit===target){
+  chooseTarget();
+ }
 }
 
 function frame(time){
@@ -237,32 +478,43 @@ function frame(time){
  if(!running||paused)return;
 
  const dt=Math.min((time-last)/1000,.05);
+
  last=time;
  spawnClock+=dt;
 
- // Fruits now appear slightly faster too.
- const interval=Math.max(.42,1.05-(level-1)*.075);
+ // Variable spawning interval
+ if(spawnClock>=nextSpawnTime){
 
- if(spawnClock>=interval){
   spawnClock=0;
+
   spawnFruit();
+
+  // Irregular fruit arrival timing
+  nextSpawnTime=random(.42,.82);
  }
 
  for(let i=items.length-1;i>=0;i--){
 
   const o=items[i];
 
+  // Faster downward movement
   o.y+=o.speed*dt;
-  o.phase+=dt*2.1;
 
-  o.x=Math.max(0,Math.min(
-   width-48,
-   o.baseX+Math.sin(o.phase)*o.amplitude
-  ));
+  // More noticeable side-to-side movement
+  o.phase+=dt*o.waveSpeed;
+
+  const zigzag=
+   Math.sin(o.phase)*o.amplitude*o.direction;
+
+  o.x=Math.max(
+   0,
+   Math.min(width-48,o.baseX+zigzag)
+  );
 
   place(o);
 
   if(o.y>height+5){
+
    items.splice(i,1);
    o.el.remove();
   }
@@ -274,22 +526,33 @@ function frame(time){
 function startGame(){
 
  cancelAnimationFrame(raf);
+
  clearItems();
 
  score=0;
  lives=3;
  level=1;
+
  nextBonus=50;
+
  spawnClock=0;
+ nextSpawnTime=.55;
+
  last=0;
  paused=false;
  running=true;
- fruitsSinceTarget=0;
+
+ nonTargetCount=0;
+ targetGap=0;
  forceTargetNext=true;
 
  resize();
- chooseTarget();
+
+ target=fruits[randomInt(0,fruits.length-1)];
+ $('targetFruit').textContent=target;
+
  updateStats();
+
  hideOverlay();
 
  $('pause').textContent='Ⅱ Pause';
@@ -299,6 +562,7 @@ function startGame(){
 }
 
 $('start').addEventListener('click',startGame);
+
 $('restart').addEventListener('click',startGame);
 
 $('pause').addEventListener('click',()=>{
@@ -306,29 +570,42 @@ $('pause').addEventListener('click',()=>{
  if(!running)return;
 
  paused=!paused;
- $('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';
 
- $('feedback').textContent=paused?
-  'Game paused':'Keep catching! 🍎';
+ $('pause').textContent=
+  paused?'▶ Resume':'Ⅱ Pause';
+
+ $('feedback').textContent=
+  paused?'Game paused':'Keep catching! 🍎';
 
  if(paused){
+
   cancelAnimationFrame(raf);
+
  }else{
+
   last=0;
   raf=requestAnimationFrame(frame);
  }
 });
 
 if('ResizeObserver'in window){
+
  new ResizeObserver(()=>{
+
   resize();
+
   items.forEach(o=>{
-   o.baseX=Math.min(o.baseX,width-48);
-   o.x=Math.min(o.x,width-48);
+
+   o.baseX=Math.max(0,Math.min(o.baseX,width-48));
+   o.x=Math.max(0,Math.min(o.x,width-48));
+
    place(o);
   });
+
  }).observe(arena);
+
 }else{
+
  window.addEventListener('resize',resize);
 }
 
@@ -337,5 +614,6 @@ updateStats();
 
 })();
 </script>
+
 </body>
 </html>
