@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fruit Catch Game</title>
+<title>Fruit Catch Challenge</title>
 
 <style>
 * {
@@ -14,34 +14,40 @@
 
 body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #101b38, #253d69);
   color: white;
   text-align: center;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-header {
-  padding: 12px 8px 5px;
-}
-
+/* PERMANENT HEADER MESSAGE */
 .greeting {
-  font-size: 19px;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 1000;
+  width: 96%;
+  max-width: 600px;
+  margin: 10px auto;
+  padding: 12px 5px;
+  text-align: center;
+  font-size: 17px;
   font-weight: bold;
-  line-height: 1.5;
-  color: #ffffff;
+  line-height: 1.7;
+  color: white;
   background: linear-gradient(90deg, #b83218, #e87918, #b83218);
-  padding: 10px 8px;
-  margin: 0 auto 10px;
-  border-radius: 12px;
   border: 2px solid #ffe66d;
+  border-radius: 12px;
   text-shadow: 1px 1px 3px #542000;
 }
 
 h1 {
-  margin: 4px 0 10px;
-  font-size: 27px;
+  margin: 5px 0 10px;
+  font-size: 26px;
   color: #ffe66d;
 }
 
@@ -92,8 +98,8 @@ h1 {
 #gameArea {
   position: relative;
   width: min(94vw, 520px);
-  height: min(57vh, 570px);
-  min-height: 320px;
+  height: min(52vh, 570px);
+  min-height: 280px;
   margin: 10px auto;
   overflow: hidden;
   border: 3px solid rgba(255,255,255,.5);
@@ -108,6 +114,7 @@ h1 {
 .fruit {
   position: absolute;
   top: 0;
+  left: 0;
   font-size: 35px;
   width: 52px;
   height: 52px;
@@ -189,32 +196,56 @@ button:active {
   margin: 5px 12px 12px;
 }
 
-@media (max-height: 650px) {
-  h1 { font-size: 22px; }
-  .greeting { font-size: 15px; padding: 7px; }
-  .stat { padding: 5px 10px; }
-  #gameArea { height: 48vh; min-height: 260px; }
-  #targetFruit { font-size: 30px; }
+@media (max-width: 400px) {
+  .greeting {
+    font-size: 15px;
+    padding: 9px 4px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .stat {
+    padding: 6px 10px;
+  }
+
+  #gameArea {
+    height: 48vh;
+    min-height: 260px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
+<!-- HEADER MESSAGE: ALWAYS VISIBLE -->
+<div class="greeting">
+  🙏 बड़का और छोटका मुसहरा तथा छोटी के तरफ से 🙏
+  <br>
+  🌞 Happy Chhath Puja of KHUTHA 🌞
+</div>
 
-  <div class="greeting">
-    🙏 बड़का और छोटका मुसहरा तथा छोटी के तरफ से 🙏
-    <br>
-    🌞 Happy Chhath Puja of KHUTHA 🌞
-  </div>
+<header>
 
   <h1>🍉 Fruit Catch Challenge 🍓</h1>
 
   <div class="stats">
-    <div class="stat">Score<strong id="score">0</strong></div>
-    <div class="stat">Lives<strong id="lives">3 ❤️</strong></div>
-    <div class="stat">Level<strong id="level">1</strong></div>
+    <div class="stat">
+      Score
+      <strong id="score">0</strong>
+    </div>
+
+    <div class="stat">
+      Lives
+      <strong id="lives">3 ❤️</strong>
+    </div>
+
+    <div class="stat">
+      Level
+      <strong id="level">1</strong>
+    </div>
   </div>
 
   <div class="target-box">
@@ -228,8 +259,10 @@ button:active {
 
   <div id="startOverlay" class="overlay">
     <h2>🍓 Ready to Play?</h2>
-    <p>Catch only the target fruit.<br>
-    Wrong fruit or missed target costs one life!</p>
+    <p>
+      Catch only the target fruit.<br>
+      Wrong fruit or missed target costs one life!
+    </p>
     <button id="startBtn">▶ START GAME</button>
   </div>
 
@@ -240,7 +273,10 @@ button:active {
 
   <div id="gameOverOverlay" class="overlay hidden">
     <h2>🎮 Game Over!</h2>
-    <p>Your Score: <strong id="finalScore">0</strong></p>
+    <p>
+      Your Score:
+      <strong id="finalScore">0</strong>
+    </p>
     <button id="restartBtn">🔄 PLAY AGAIN</button>
   </div>
 
@@ -254,7 +290,7 @@ button:active {
 </div>
 
 <div class="instructions">
-  सही फल पकड़ें = +5 Points &nbsp; | &nbsp;
+  सही फल पकड़ें = +5 Points |
   हर 200 Points = +2 Lives
 </div>
 
@@ -287,6 +323,7 @@ let nonTargetCount = 0;
 let forceTargetNext = true;
 
 let objects = [];
+
 let running = false;
 let gameOver = false;
 
@@ -371,6 +408,7 @@ function pauseGame() {
 
   running = false;
   cancelAnimationFrame(animationId);
+
   pauseOverlay.classList.remove('hidden');
 }
 
@@ -378,6 +416,7 @@ function resumeGame() {
   if (gameOver) return;
 
   pauseOverlay.classList.add('hidden');
+
   running = true;
   lastTime = 0;
 
@@ -391,6 +430,7 @@ function endGame() {
   cancelAnimationFrame(animationId);
 
   document.getElementById('finalScore').textContent = score;
+
   gameOverOverlay.classList.remove('hidden');
 
   messageEl.textContent = 'Game Over!';
@@ -435,10 +475,11 @@ function spawnFruit() {
     fruit = target;
     forceTargetNext = false;
     nonTargetCount = 0;
+
   } else if (nonTargetCount >= targetGap) {
     fruit = target;
-    nonTargetCount = 0;
     setRandomTargetGap();
+
   } else {
     do {
       fruit = fruits[randomInt(0, fruits.length - 1)];
@@ -459,7 +500,10 @@ function spawnFruit() {
     x: x,
     y: -55,
     startX: x,
+
+    // Starting speed kept at one-fourth of the earlier speed
     speed: random(22.5, 27.5) * (1 + (level - 1) * 0.12),
+
     amplitude: random(22, 43),
     waveSpeed: random(2.5, 3.6),
     direction: Math.random() < 0.5 ? 1 : -1,
@@ -480,17 +524,20 @@ function selectFruit(item) {
   if (!running || gameOver) return;
 
   const index = objects.indexOf(item);
+
   if (index === -1) return;
 
   item.el.remove();
   objects.splice(index, 1);
 
   if (item.isTarget && item.fruit === target) {
+
     score += 5;
 
     while (score >= nextBonus) {
       lives += 2;
       nextBonus += 200;
+
       messageEl.textContent = '🎉 Bonus! +2 Lives!';
     }
 
@@ -501,6 +548,7 @@ function selectFruit(item) {
     messageEl.textContent = '✅ Correct! +5 Points';
 
     chooseTarget();
+
     messageEl.textContent += ' | Next: ' + target;
 
   } else {
@@ -513,13 +561,18 @@ function frame(timestamp) {
 
   if (!lastTime) lastTime = timestamp;
 
-  const delta = Math.min((timestamp - lastTime) / 1000, 0.05);
+  const delta = Math.min(
+    (timestamp - lastTime) / 1000,
+    0.05
+  );
+
   lastTime = timestamp;
 
   spawnTimer += delta;
 
   if (spawnTimer >= nextSpawn) {
     spawnFruit();
+
     spawnTimer = 0;
     nextSpawn = random(0.42, 0.82);
   }
@@ -539,12 +592,16 @@ function frame(timestamp) {
 
     let currentX = o.startX + wave;
 
-    currentX = Math.max(0, Math.min(width - 52, currentX));
+    currentX = Math.max(
+      0,
+      Math.min(width - 52, currentX)
+    );
 
     o.el.style.transform =
       'translate(' + currentX + 'px,' + o.y + 'px)';
 
     if (o.y > height) {
+
       o.el.remove();
       objects.splice(i, 1);
 
@@ -559,11 +616,20 @@ function frame(timestamp) {
   animationId = requestAnimationFrame(frame);
 }
 
-document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('restartBtn').addEventListener('click', startGame);
-document.getElementById('restartSmallBtn').addEventListener('click', startGame);
-document.getElementById('pauseBtn').addEventListener('click', pauseGame);
-document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+document.getElementById('startBtn')
+  .addEventListener('click', startGame);
+
+document.getElementById('restartBtn')
+  .addEventListener('click', startGame);
+
+document.getElementById('restartSmallBtn')
+  .addEventListener('click', startGame);
+
+document.getElementById('pauseBtn')
+  .addEventListener('click', pauseGame);
+
+document.getElementById('resumeBtn')
+  .addEventListener('click', resumeGame);
 
 updateStats();
 </script>
